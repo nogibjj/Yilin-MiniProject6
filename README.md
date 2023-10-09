@@ -1,113 +1,61 @@
 ![Test Python Versions](https://github.com/nogibjj/IDS706-MiniProject5-Sqlite/actions/workflows/cicd.yml/badge.svg)
 # IDS706 Mini Project6: Complex SQL Query for a MySQL Database
 
-## Project Description
-
-This project is a simple Python application that interacts with a SQLite database named `GroceryDB`. It provides basic CRUD functionality: Create, Read, Update, and Delete operations on the `GroceryDB` database. It uses SQLite3 for database interaction and PrettyTable to display the query results in a tabular format.
+## Project Goals
+- Design a complex SQL query involving joins, aggregation, and sorting
+- Provide an explanation for what the query is doing and the expected results
 
 ## Queries Description & Results
 
 ### Query 1 - Read Operation
-- This query performs read operation on the `GroceryDB` database. It selects all the rows from the `GroceryDB` table and displays the top 5 rows of the table.
-```python
-def query1():
-    conn = sqlite3.connect("GroceryDB.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM GroceryDB LIMIT 5 OFFSET 1")
-    column_names = [description[0] for description in cursor.description]
-    table = PrettyTable(column_names)
-    for row in cursor.fetchall():
-        table.add_row(row)
-    print("Top 5 rows of the GroceryDB:")
-    print(table)
-    conn.close()
-    return "Success"
+- The CustomerSpend CTE (Common Table Expression) calculates the total amount spent by each customer in the past year and selects the top 5 spenders.
+- The subquery in the main SELECT joins with the CustomerSpend CTE and aggregates the data to find the most purchased product for each of the top 5 customers.
+- Finally, the results are ordered by the total amount spent and the count of the most purchased product.
+```sql
+WITH CustomerSpend AS (
+    SELECT 
+        c.customer_id,
+        c.customer_name,
+        SUM(o.amount) AS total_spent
+    FROM 
+        Customers c
+    JOIN 
+        Orders o ON c.customer_id = o.customer_id
+    WHERE 
+        o.order_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 YEAR) AND CURDATE()
+    GROUP BY 
+        c.customer_id, 
+        c.customer_name
+    ORDER BY 
+        total_spent DESC
+    LIMIT 5
+)
+
+SELECT 
+    cs.customer_name,
+    cs.total_spent,
+    p.product_name AS most_purchased_product
+FROM 
+    CustomerSpend cs
+JOIN 
+    (SELECT 
+        o.customer_id,
+        o.product_id,
+        COUNT(*) as purchase_count
+     FROM 
+        Orders o
+     GROUP BY 
+        o.customer_id, 
+        o.product_id) subq ON cs.customer_id = subq.customer_id
+JOIN 
+    Products p ON subq.product_id = p.product_id
+ORDER BY 
+    cs.total_spent DESC, 
+    subq.purchase_count DESC;
+
 ```
 ### Result
-![Query 1 Result](Results/q1.png "Query 1 Result")
-### Query 2 - Update Operation
-- This query performs update operation on the `GroceryDB` database. It updates the `count_products` column of the `GroceryDB` table for the row with `general_name` as `arabica coffee`.
-```python
-def query2():
-    '''Update the count_products of the arabica coffee in the GroceryDB table'''
-    conn = sqlite3.connect("GroceryDB.db")
-    cursor = conn.cursor()
-
-    # Define the new count_products value
-    new_count_products = 100
-    item_name = "arabica coffee"
-
-    cursor.execute("UPDATE GroceryDB SET count_products = ? WHERE general_name = ?", (new_count_products, item_name))
-    conn.commit()
-    conn.close()
-    # Print the updated row
-    print("Updated row:")
-    query1()
-    return "Update Success"
-```
-### Result
-![Query 2 Result](Results/q2.png "Query 2 Result")
-### Query 3 - Insert Operation
-- This query performs insert operation on the `GroceryDB` database. It inserts a new row into the `GroceryDB` table.
-```python
-def query3():
-    '''INSERT a new row into the GroceryDB table'''
-    conn = sqlite3.connect("GroceryDB.db")
-    cursor = conn.cursor()
-
-    # Define the values for the new row
-    values = ('new_general_name', 10, 0.1, 0.2, 3.0, 10.0, 'new_tree_name', 'new_tree_node')
-
-    cursor.execute("""
-        INSERT INTO GroceryDB (general_name, count_products, ingred_FPro, 
-        avg_FPro_products, avg_distance_root, ingred_normalization_term, 
-        semantic_tree_name, semantic_tree_node) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, values) 
-    
-    conn.commit()
-    
-    # Retrieve and print the inserted row based on a unique field, e.g., general_name
-    cursor.execute("SELECT * FROM GroceryDB WHERE general_name = ?", (values[0],))
-    row = cursor.fetchone()
-    
-    if row:
-        column_names = [description[0] for description in cursor.description]
-        table = PrettyTable(column_names)  # Initializing table with column names
-        table.add_row(row)
-        print("Inserted new row:")
-        print(table)
-    else:
-        print("Inserted row could not be retrieved")
-        
-    conn.close()
-    return "Insert Success"
-```
-### Result
-![Query 3 Result](Results/q3.png "Query 3 Result")
-### Query 4 - Delete Operation
-- This query performs delete operation on the `GroceryDB` database. It deletes the row from the `GroceryDB` table with `general_name` as `arabica coffee`.
-```python
-def query4():
-    '''DELETE the row containing arabica coffee in the GroceryDB table'''
-    conn = sqlite3.connect("GroceryDB.db")
-    cursor = conn.cursor()
-
-    # Define the item_name to delete
-    item_name = "arabica coffee"
-
-    # Execute DELETE command
-    cursor.execute("DELETE FROM GroceryDB WHERE general_name = ?", (item_name,))
-    conn.commit()
-
-    # Print the updated rows
-    print("Deleted rows containing arabica coffee:")
-    query1()
-
-    conn.close()
-    return "Delete Success"
-```
-### Result
-![Query 4 Result](Results/q4.png "Query 4 Result")
+![Query 1 Result](Results/Result.png "Query 1 Result")
 
 ## How to Run
 ```bash

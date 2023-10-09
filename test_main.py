@@ -1,38 +1,47 @@
 import unittest
 import sqlite3
-from mylib.query import query1, query2, query3, query4
+from main import initialize_database
+from mylib.query import execute_query
 
-class TestMain(unittest.TestCase):
+class TestDatabase(unittest.TestCase):
 
     def setUp(self):
-        # Setting up a test database
-        self.conn = sqlite3.connect("GroceryDB_test.db")
-        # Assuming you have a table creation query, you would execute it here
-        # e.g. self.conn.execute(CREATE TABLE ...)
-        self.conn.close()
+        # Create an in-memory database for testing
+        self.conn = initialize_database()
 
     def tearDown(self):
-        # Cleaning up the test database after tests
-        self.conn = sqlite3.connect("GroceryDB_test.db")
+        # Close the database connection after each test
         self.conn.close()
 
-    def test_query1(self):
-        result = query1()
-        self.assertEqual(result, "Success", "Failed to fetch the top 5 rows")
+    def test_database_population(self):
+        """Test if tables are populated correctly."""
+        cursor = self.conn.cursor()
 
-    def test_query2(self):
-        result = query2()
-        self.assertEqual(result, "Update Success",
-                          "Failed to update the count_products of arabica coffee")
+        # Check the number of rows in each table
+        cursor.execute("SELECT COUNT(*) FROM Customers")
+        self.assertEqual(cursor.fetchone()[0], 6)
 
-    def test_query3(self):
-        result = query3()
-        self.assertEqual(result, "Insert Success", "Failed to insert a new row")
+        cursor.execute("SELECT COUNT(*) FROM Orders")
+        self.assertEqual(cursor.fetchone()[0], 9)
 
-    def test_query4(self):
-        result = query4()
-        self.assertEqual(result, "Delete Success",
-                          "Failed to delete the row containing arabica coffee")
+        cursor.execute("SELECT COUNT(*) FROM Products")
+        self.assertEqual(cursor.fetchone()[0], 3)
 
-if __name__ == "__main__":
+    def test_query_results(self):
+        """Test if the complex query returns expected results."""
+        cursor = self.conn.cursor()
+
+        # Execute the main query
+        results = list(execute_query(self.conn))
+        
+        # Here, you should specify the expected results based on the sample data
+        expected_results = [
+            # Replace with expected tuples from the result of the complex query
+            # Example: ('Alice', 250, 'Laptop')
+        ]
+
+        self.assertEqual(results, expected_results)
+
+
+if __name__ == '__main__':
     unittest.main()
