@@ -1,25 +1,30 @@
-"""
-ETL-Query script
-"""
+import mysql.connector
+from mylib.query import load_data, get_top_customers
 
-from mylib.extract import extract
-from mylib.transform_load import load
-from mylib.query import query1, query2, query3, query4
+def main():
+    # Connect to MySQL
+    db_config = {
+        "host": "localhost",
+        "user": "your_username",
+        "password": "your_password",
+        "database": "your_database"
+    }
+    
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
 
-# Extract
-print("Extracting data...")
-extract()
+    # Load CSV data into MySQL
+    load_data(cursor, conn)
 
-# Transform and load
-print("Transforming data...")
-load()
+    # Get the desired output
+    result = get_top_customers(cursor)
+    
+    for row in result:
+        print(row)
 
-# Query
-print("Querying data...")
-query1()
-print()
-query2()
-print()
-query3()
-print()
-query4()
+    # Close the connection
+    cursor.close()
+    conn.close()
+
+if __name__ == "__main__":
+    main()
