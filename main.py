@@ -1,30 +1,56 @@
-import mysql.connector
-from mylib.query import load_data, get_top_customers
+import sqlite3
+import csv
 
-def main():
-    # Connect to MySQL
-    db_config = {
-        "host": "localhost",
-        "user": "your_username",
-        "password": "your_password",
-        "database": "your_database"
-    }
-    
-    conn = mysql.connector.connect(**db_config)
+def initialize_database():
+    """Create and populate SQLite database with data from CSV files."""
+    # Connect to SQLite database (in memory for demonstration purposes)
+    conn = sqlite3.connect(':memory:')
     cursor = conn.cursor()
 
-    # Load CSV data into MySQL
-    load_data(cursor, conn)
+    # Create tables
+    cursor.execute("""
+        CREATE TABLE Customers (
+            customer_id INTEGER PRIMARY KEY,
+            customer_name TEXT
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE Orders (
+            order_id INTEGER PRIMARY KEY,
+            customer_id INTEGER,
+            product_id INTEGER,
+            order_date DATE,
+            amount REAL
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE Products (
+            product_id INTEGER PRIMARY KEY,
+            product_name TEXT
+        )
+    """)
 
-    # Get the desired output
-    result = get_top_customers(cursor)
+    # Insert CSV data into tables
+    with open('data/customers.csv', 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header
+        cursor.executemany('INSERT INTO Customers VALUES (?, ?)', reader)
     
-    for row in result:
-        print(row)
+    with open('data/orders.csv', 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header
+        cursor.executemany('INSERT INTO Orders VALUES (?, ?, ?, ?, ?)', reader)
 
-    # Close the connection
-    cursor.close()
-    conn.close()
+    with open('data/products.csv', 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header
+        cursor.executemany('INSERT INTO Products VALUES (?, ?)', reader)
+
+    conn.commit()
+
+    return conn
 
 if __name__ == "__main__":
-    main()
+    conn = initialize_database()
+    from mylib.query import execute_query
+    execute_query(conn)
