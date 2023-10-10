@@ -16,7 +16,8 @@ def create_database(conn, dbname):
 def connect_to_database(host, user, password, dbname):
     """Establishes a connection to a specific database."""
     try:
-        return mysql.connector.connect(host=host, user=user, password=password, database=dbname)
+        return mysql.connector.connect(
+            host=host, user=user, password=password, database=dbname)
     except mysql.connector.Error as e:
         print(f"Error connecting to database: {e}")
         raise
@@ -43,7 +44,8 @@ def main():
 
     # Connect to MySQL without specifying a database
     try:
-        initial_conn = mysql.connector.connect(host=db_config["host"], user=db_config["user"], password=db_config["password"])
+        initial_conn = mysql.connector.connect(
+            host=db_config["host"], user=db_config["user"], password=db_config["password"])
 
         # Ensure the database exists
         create_database(initial_conn, db_config["dbname"])
@@ -60,11 +62,14 @@ def main():
 
         # Avoid creating tables if they already exist
         if not any('Customers' in table for table in tables):
-            cursor.execute("CREATE TABLE Customers (customer_id INT PRIMARY KEY, customer_name VARCHAR(255))")
+            cursor.execute("CREATE TABLE Customers "
+                           "(customer_id INT PRIMARY KEY, customer_name VARCHAR(255))")
         if not any('Products' in table for table in tables):
-            cursor.execute("CREATE TABLE Products (product_id INT PRIMARY KEY, product_name VARCHAR(255))")
+            cursor.execute("CREATE TABLE Products "
+                           "(product_id INT PRIMARY KEY, product_name VARCHAR(255))")
         if not any('Orders' in table for table in tables):
-            cursor.execute("""CREATE TABLE Orders (order_id INT PRIMARY KEY, customer_id INT, product_id INT, 
+            cursor.execute("""CREATE TABLE Orders (order_id INT PRIMARY KEY,
+                             customer_id INT, product_id INT, 
                               order_date DATE, amount DECIMAL(10, 2), 
                               FOREIGN KEY(customer_id) REFERENCES Customers(customer_id),
                               FOREIGN KEY(product_id) REFERENCES Products(product_id))""")

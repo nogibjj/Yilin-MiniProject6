@@ -1,7 +1,10 @@
 import mysql.connector
 
 def complex_query():
-    conn = mysql.connector.connect(host='localhost', user='root', password='Welcome1!', database='ecommerce_db')
+    conn = mysql.connector.connect(host='localhost', 
+                                   user='root', 
+                                   password='Welcome1!', 
+                                   database='ecommerce_db')
     cursor = conn.cursor()
 
     # Read the query from the .sql file

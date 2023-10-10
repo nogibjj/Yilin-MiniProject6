@@ -14,7 +14,9 @@ class TestMainFunctions(unittest.TestCase):
         }
 
         # Establish a connection without specifying a database
-        self.conn = mysql.connector.connect(host=self.db_config["host"], user=self.db_config["user"], password=self.db_config["password"])
+        self.conn = mysql.connector.connect(host=self.db_config["host"], 
+                                            user=self.db_config["user"], 
+                                            password=self.db_config["password"])
         self.cursor = self.conn.cursor()
 
         # Ensure the test database exists before all tests
@@ -40,9 +42,12 @@ class TestMainFunctions(unittest.TestCase):
         cursor.execute("DROP TABLE IF EXISTS Products")
 
         # Create tables
-        cursor.execute("CREATE TABLE Customers (customer_id INT PRIMARY KEY, customer_name VARCHAR(255))")
-        cursor.execute("CREATE TABLE Products (product_id INT PRIMARY KEY, product_name VARCHAR(255))")
-        cursor.execute("""CREATE TABLE Orders (order_id INT PRIMARY KEY, customer_id INT, product_id INT, 
+        cursor.execute("CREATE TABLE Customers (customer_id INT PRIMARY KEY, "
+                       "customer_name VARCHAR(255))")
+        cursor.execute("CREATE TABLE Products (product_id INT PRIMARY KEY, "
+                       "product_name VARCHAR(255))")
+        cursor.execute("""CREATE TABLE Orders (order_id INT PRIMARY KEY, 
+                       customer_id INT, product_id INT, 
                     order_date DATE, amount DECIMAL(10, 2), 
                     FOREIGN KEY(customer_id) REFERENCES Customers(customer_id),
                     FOREIGN KEY(product_id) REFERENCES Products(product_id))""")
