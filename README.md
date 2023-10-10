@@ -6,8 +6,6 @@
 - Provide an explanation for what the query is doing and the expected results
 
 ## Queries Description & Results
-
-### Query 1 - Read Operation
 - The CustomerSpend CTE (Common Table Expression) calculates the total amount spent by each customer in the past year and selects the top 5 spenders.
 - The subquery in the main SELECT joins with the CustomerSpend CTE and aggregates the data to find the most purchased product for each of the top 5 customers.
 - Finally, the results are ordered by the total amount spent and the count of the most purchased product.
@@ -66,4 +64,4 @@ python3 main.py
 ```bash
 python -m unittest test_main.py
 ```
-![Test Result](Results/q5.png "Test Result")
+![Test Result](Results/TestResult.png "Test Result")
