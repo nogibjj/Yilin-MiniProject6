@@ -1,7 +1,7 @@
 import unittest
 import sqlite3
 from main import initialize_database
-from mylib.query import execute_query
+from query import execute_query
 
 class TestDatabase(unittest.TestCase):
 
