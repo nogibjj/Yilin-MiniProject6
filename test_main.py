@@ -10,7 +10,8 @@ class TestMainFunctions(unittest.TestCase):
             "host": "localhost",
             "user": "root",
             "password": "Welcome1!",
-            "dbname": "ecommerce_db_test"  # Use a different DB name for testing purposes
+            "dbname": "ecommerce_db_test"  
+            # Use a different DB name for testing purposes
         }
 
         # Establish a connection without specifying a database
@@ -64,7 +65,7 @@ class TestMainFunctions(unittest.TestCase):
 
 
     def test_print_complex_query(self):
-        # We're just testing if the function runs without errors, actual data verification 
+        # Just testing if the function runs without errors, actual data verification 
         # would require seeding the database with known data and then validating results
         try:
             print_complex_query()

@@ -1,6 +1,6 @@
 import mysql.connector
 from prettytable import PrettyTable
-from query import complex_query  # Ensure query.py is in the same directory or in the PYTHONPATH
+from query import complex_query  
 
 def create_database(conn, dbname):
     """Creates the database if it doesn't exist."""
@@ -45,7 +45,9 @@ def main():
     # Connect to MySQL without specifying a database
     try:
         initial_conn = mysql.connector.connect(
-            host=db_config["host"], user=db_config["user"], password=db_config["password"])
+            host=db_config["host"], 
+            user=db_config["user"], 
+            password=db_config["password"])
 
         # Ensure the database exists
         create_database(initial_conn, db_config["dbname"])
@@ -69,10 +71,12 @@ def main():
                            "(product_id INT PRIMARY KEY, product_name VARCHAR(255))")
         if not any('Orders' in table for table in tables):
             cursor.execute("""CREATE TABLE Orders (order_id INT PRIMARY KEY,
-                             customer_id INT, product_id INT, 
+                              customer_id INT, product_id INT, 
                               order_date DATE, amount DECIMAL(10, 2), 
-                              FOREIGN KEY(customer_id) REFERENCES Customers(customer_id),
-                              FOREIGN KEY(product_id) REFERENCES Products(product_id))""")
+                              FOREIGN KEY(customer_id) 
+                              REFERENCES Customers(customer_id),
+                              FOREIGN KEY(product_id) 
+                              REFERENCES Products(product_id))""")
 
         # Show tables after creation
         cursor.execute("SHOW TABLES")
